@@ -9,13 +9,13 @@ let cameraId = '';
 let micId = '';
 
 function login() {
-    if ($('#userId').val()=='') {
+    if ($('#userId').val() == '') {
         alert('用户名不能为空！');
-        return ;
+        return;
     }
-    if ($('#roomId').val()=='') {
+    if ($('#roomId').val() == '') {
         alert('房间号不能为空！');
-        return ;
+        return;
     }
     presetting.login(false, options => {
         rtc = new RtcClient(options);
@@ -87,7 +87,7 @@ function setBtnClickFuc() {
         e.preventDefault();
         console.log('roomId input ' + e.target.value);
         let val = $('#roomId').val();
-        $('#roomId').val(val.replace(/[^\d]/g,''));
+        $('#roomId').val(val.replace(/[^\d]/g, ''));
     });
     //login
     $('#login-btn').click(() => {
@@ -126,7 +126,7 @@ function setBtnClickFuc() {
         }
     });
     //share screen or not
-    $('#screen-btn').on('click', 
+    $('#screen-btn').on('click',
         throttle(() => {
             if (!TRTC.isScreenShareSupported()) {
                 alert('当前浏览器不支持屏幕分享！');
@@ -145,9 +145,11 @@ function setBtnClickFuc() {
     );
     //logout
     $('#logout-btn').on('click', () => {
-        leave();
-        $('#room-root').hide();
-        $('#login-root').show();
+        leaveOut();
+        // leave();
+        // $('#room-root').hide();
+        // $("#freeBox").removeClass("hidden")
+        //   $('#login-root').show();
     });
     //switch main video
     $('#main-video').on('click', () => {
@@ -161,16 +163,16 @@ function setBtnClickFuc() {
         //将video-grid中第一个div设为main-video
         $('.video-box').first().css('grid-area', '1/1/3/4');
         //chromeM71以下会自动暂停，手动唤醒
-        if (getBroswer().broswer=='Chrome' && getBroswer().version<'72') {
+        if (getBroswer().broswer == 'Chrome' && getBroswer().version < '72') {
             rtc.resumeStreams();
         }
     });
 
     //chrome60以下不支持popover，防止error
-    if (getBroswer().broswer=='Chrome' && getBroswer().version<'60')
+    if (getBroswer().broswer == 'Chrome' && getBroswer().version < '60')
         return;
     //开启popover
-    $(function () {
+    $(function() {
         $('[data-toggle="popover"]').popover()
     })
     $('#camera').popover({
@@ -247,7 +249,7 @@ function addVideoView(id, isLocal = false) {
         //将video-grid中第一个div设为main-video
         $('.video-box').first().css('grid-area', '1/1/3/4');
         //chromeM71以下会自动暂停，手动唤醒
-        if (getBroswer().broswer=='Chrome' && getBroswer().version<'72') {
+        if (getBroswer().broswer == 'Chrome' && getBroswer().version < '72') {
             rtc.resumeStreams();
         }
     });
@@ -308,7 +310,7 @@ function getMicrophoneId() {
 function throttle(func, delay) {
     var timer = null;
     var startTime = Date.now();
-    return function () {
+    return function() {
         var curTime = Date.now();
         var remaining = delay - (curTime - startTime);
         var context = this;
@@ -349,30 +351,30 @@ function resetView() {
     }
 }
 
-function getBroswer(){
+function getBroswer() {
     var sys = {};
     var ua = navigator.userAgent.toLowerCase();
     var s;
-    (s = ua.match(/edge\/([\d.]+)/)) ? sys.edge = s[1] :
-    (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? sys.ie = s[1] :
-    (s = ua.match(/msie ([\d.]+)/)) ? sys.ie = s[1] :
-    (s = ua.match(/firefox\/([\d.]+)/)) ? sys.firefox = s[1] :
-    (s = ua.match(/chrome\/([\d.]+)/)) ? sys.chrome = s[1] :
-    (s = ua.match(/opera.([\d.]+)/)) ? sys.opera = s[1] :
-    (s = ua.match(/version\/([\d.]+).*safari/)) ? sys.safari = s[1] : 0;
+    (s = ua.match(/edge\/([\d.]+)/)) ? sys.edge = s[1]:
+        (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? sys.ie = s[1] :
+        (s = ua.match(/msie ([\d.]+)/)) ? sys.ie = s[1] :
+        (s = ua.match(/firefox\/([\d.]+)/)) ? sys.firefox = s[1] :
+        (s = ua.match(/chrome\/([\d.]+)/)) ? sys.chrome = s[1] :
+        (s = ua.match(/opera.([\d.]+)/)) ? sys.opera = s[1] :
+        (s = ua.match(/version\/([\d.]+).*safari/)) ? sys.safari = s[1] : 0;
 
-    if (sys.edge) return { broswer : "Edge", version : sys.edge };
-    if (sys.ie) return { broswer : "IE", version : sys.ie };
-    if (sys.firefox) return { broswer : "Firefox", version : sys.firefox };
-    if (sys.chrome) return { broswer : "Chrome", version : sys.chrome };
-    if (sys.opera) return { broswer : "Opera", version : sys.opera };
-    if (sys.safari) return { broswer : "Safari", version : sys.safari };
-    
-    return { broswer : "", version : "0" };
+    if (sys.edge) return { broswer: "Edge", version: sys.edge };
+    if (sys.ie) return { broswer: "IE", version: sys.ie };
+    if (sys.firefox) return { broswer: "Firefox", version: sys.firefox };
+    if (sys.chrome) return { broswer: "Chrome", version: sys.chrome };
+    if (sys.opera) return { broswer: "Opera", version: sys.opera };
+    if (sys.safari) return { broswer: "Safari", version: sys.safari };
+
+    return { broswer: "", version: "0" };
 }
 
 function isHidden() {
-    var hidden, visibilityChange; 
+    var hidden, visibilityChange;
     if (typeof document.hidden !== "undefined") {
         hidden = "hidden";
         visibilityChange = "visibilitychange";
@@ -384,4 +386,12 @@ function isHidden() {
         visibilityChange = "webkitvisibilitychange";
     }
     return document[hidden];
+}
+
+
+//离开退出视频 ui
+function leaveOut() {
+    leave();
+    $('#room-root').hide();
+    $("#freeBox").removeClass("hidden")
 }
