@@ -7,6 +7,12 @@ let share = null;
 let shareUserId = '';
 let cameraId = '';
 let micId = '';
+var URL = 'http://{server}/acd/'
+var agent_Id = null;
+var cusId = null; //客户号
+var room_Id = null; //房间id
+var token_ = null;
+var login_Name = ''
 
 function login() {
     if ($('#userId').val() == '') {
@@ -388,10 +394,200 @@ function isHidden() {
     return document[hidden];
 }
 
+function showTip(msg) {
+    var topTip = $("<div class='tip'><div class='fadeIn'>" + msg + "</div></div>");
+    $("body").append(topTip);
+    setTimeout(function() {
+        topTip.remove();
+    }, 2000);
+}
 
 //离开退出视频 ui
 function leaveOut() {
     leave();
     $('#room-root').hide();
     $("#freeBox").removeClass("hidden")
+}
+
+//登入坐席
+function loginAgent() {
+    let name = $('.nameInp').val();
+    let pwd = $('.passInp').val();
+    if (name == '') {
+        showTip('用户名不能为空！')
+        return;
+    }
+    if (pwd == '') {
+        showTip('房间号不能为空！')
+        return;
+    }
+    let params = {
+        loginName: name,
+        password: pwd,
+        type: 1,
+        deviceId: ''
+    }
+    let url = 'login'
+    fetchPost(url, JSON.stringify(params)).then(res => {
+        console.log(res)
+        if (res.code == 0) {
+            login_Name = name
+                // $("#loginContainer").hide()
+                //  $("#freeBox").removeClass("hidden")
+        } else {
+            showTip(msg)
+        }
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
+//登出坐席
+function logoutAgent() {
+    let url = 'logout'
+    let params = {
+        loginName: login_Name,
+        type: 1
+    }
+    fetchPost(url, JSON.stringify(params)).then(res => {
+        console.log(res)
+        if (res.code == 0) {
+            // $("#loginContainer").show()
+            //  $("#freeBox").addClass("hidden")
+            let promise = tim.quitGroup({ groupID: 'b15ad31ad3e958e297d069c795d4dee7' });
+            promise.then(function(imResponse) {
+                console.log(imResponse.data.groupID); // 退出成功的群 ID
+            }).catch(function(imError) {
+                console.warn('quitGroup error:', imError); // 退出群组失败的相关信息
+            });
+        } else {
+            showTip(msg)
+        }
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
+//坐席加入
+function joinAgent() {
+    let url = 'agent/join'
+    let params = {
+        agentId: agent_Id,
+        cusId: cus_Id,
+        roomId: room_Id,
+        operationTime: getTime()
+    };
+    fetchPost(url, JSON.stringify(params)).then(res => {
+        console.log(res)
+        if (res.code == 0) {
+
+        } else {
+            showTip(msg)
+        }
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
+//坐席离开
+function leaveAgent() {
+    let url = 'agent/leave'
+    let params = {
+        agentId: agent_Id,
+        cusId: cus_Id,
+        roomId: room_Id,
+        operationTime: getTime()
+    };
+    fetchPost(url, JSON.stringify(params)).then(res => {
+        console.log(res)
+        if (res.code == 0) {
+
+        } else {
+            showTip(msg)
+        }
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
+//汇报数据
+function reportData(type) {
+    let url = 'report/send'
+    let params = {
+        loginName: login_Name,
+        roomId: room_Id,
+        userType: 1,
+        operationTime: getTime(),
+        operationType: type
+    }
+    fetchPost(url, params).then(res => {
+        console.log(res)
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
+function getTime() {
+    let day = new Date(); //将毫秒转化为当前日期
+    console.log(day)
+    let year = day.getFullYear();
+    let month = day.getMonth() + 1;
+    let date = day.getDate();
+    let hour = day.getHours();
+    let minutes = day.getMinutes();
+    let seconds = day.getSeconds();
+    if (month < 10) {
+        month = "0" + month;
+    }
+    if (date < 10) {
+        date = "0" + date;
+    }
+    if (hour < 10) {
+        hour = "0" + hour;
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+        minutes = "0" + seconds;
+    }
+    let newDay = `${year}-${month}-${date} ${hour}:${minutes}:${seconds}`
+    console.log(newDay)
+    return newDay;
+}
+
+
+//post请求
+function fetchPost(url, params) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: URL + url,
+            type: 'post',
+            // contentType: 'application/json; charset=utf-8',
+            data: params,
+            success: function(res) {
+                resolve(res)
+            },
+            error: function(err) {
+                reject(err)
+            }
+        })
+    })
+}
+//get请求
+function fetchGet(url, params) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: URL + url,
+            type: 'get',
+            contentType: 'application/json; charset=utf-8',
+            data: params,
+            success: function(res) {
+                resolve(res.data)
+            },
+            error: function(err) {
+                reject(err)
+            }
+        })
+    })
 }

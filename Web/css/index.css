@@ -104,8 +104,8 @@ div {
     top: 0;
     bottom: 0;
     right: 0;
-    background: rgb(39, 71, 77);
-    align-items: center;
+    background: url('../img/bg.png') no-repeat center;
+    background-size: cover;
     justify-content: center;
 }
 
@@ -120,6 +120,8 @@ div {
     align-items: center;
     flex-grow: 1;
     height: 100%;
+    background: #fff;
+    justify-content: center;
 }
 
 .inpBox {
@@ -129,12 +131,25 @@ div {
     justify-content: center;
 }
 
+.inpBox input {
+    width: 227px;
+    height: 36px;
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(61, 124, 240, 1);
+    border-radius: 18px;
+    padding-left: 20px;
+    font-size: 14px;
+    outline: none;
+}
+
 .inpBox button {
-    width: 200px;
-    height: 50px;
+    width: 227px;
+    height: 36px;
+    background: linear-gradient(90deg, rgba(86, 179, 242, 1) 0%, rgba(63, 133, 235, 1) 100%);
+    border-radius: 18px;
     border: none;
     outline: none;
-    margin-top: 20px!important;
+    margin-top: 30px!important;
 }
 
 #freeBox {
@@ -154,11 +169,22 @@ div {
     color: #fff;
     font-size: 16px;
     background: linear-gradient(135deg, rgba(89, 180, 242, 1) 0%, rgba(75, 139, 237, 1) 100%);
+    position: relative;
+}
+
+.freeTop img {
+    padding-left: 20px;
+    margin-right: 8px;
 }
 
 .freeTop p {
-    padding-left: 20px;
-    margin: 0!important;
+    margin: 0 !important;
+}
+
+.freeTop .out {
+    position: absolute;
+    right: 50px;
+    cursor: pointer;
 }
 
 .freeBottom {
@@ -173,4 +199,72 @@ div {
     font-size: 16px;
     color: #333;
     margin-top: 20px;
+}
+
+
+/*提示样式*/
+
+.tip {
+    position: fixed;
+    top: 0;
+    font-size: 18px;
+    height: 100%;
+    width: 100%;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tip div {
+    display: initial!important;
+    margin: 0 auto;
+    background: #76797D;
+    border-radius: 40px;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    /* top: 40%;
+    position: relative; */
+    /* opacity: 0; */
+}
+
+
+/*动画*/
+
+@-webkit-keyframes fadeIn {
+    0% {
+        opacity: 0;
+        /*初始状态 透明度为0*/
+        -webkit-transform: translateY(30px);
+        transform: translateY(30px);
+    }
+    35% {
+        opacity: 1;
+        /*中间状态 透明度为0*/
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+    65% {
+        opacity: 1;
+        /*中间状态 透明度为0*/
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        /*结尾状态 透明度为1*/
+        -webkit-transform: translateY(30px);
+        transform: translateY(30px);
+        display: none;
+    }
+}
+
+.fadeIn {
+    animation: fadeIn;
+    /*动画名称*/
+    animation-duration: 2s;
+    /*动画持续时间*/
+    -webkit-animation: fadeIn 2s;
+    /*针对webkit内核*/
 }

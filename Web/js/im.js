@@ -31,6 +31,7 @@ function initIm() {
 
 getUserSig()
     //获取usersig
+
 function getUserSig() {
     let data_ = {
         "account": 'zhaoq'
@@ -50,6 +51,7 @@ function getUserSig() {
         }
 
     })
+
 }
 
 //登录
@@ -57,22 +59,22 @@ function loginIm(sig_) {
     let promise = tim.login({ userID: 'zhaoq', userSig: sig_ });
     promise.then(function(imResponse) {
         console.log(imResponse.data + '登录成功'); // 登录成功
-        let promise = tim.joinGroup({ groupID: 'b15ad31ad3e958e297d069c795d4dee7', type: TIM.TYPES.GRP_CHATROOM });
-        promise.then(function(imResponse) {
-            switch (imResponse.data.status) {
-                case TIM.TYPES.JOIN_STATUS_WAIT_APPROVAL: // 等待管理员同意
-                    break;
-                case TIM.TYPES.JOIN_STATUS_SUCCESS: // 加群成功
-                    console.log(imResponse.data.group); // 加入的群组资料
-                    break;
-                case TIM.TYPES.JOIN_STATUS_ALREADY_IN_GROUP: // 已经在群中
-                    break;
-                default:
-                    break;
-            }
-        }).catch(function(imError) {
-            console.warn('joinGroup error:', imError); // 申请加群失败的相关信息
-        });
+        // let promise = tim.joinGroup({ groupID: 'b15ad31ad3e958e297d069c795d4dee7', type: TIM.TYPES.GRP_CHATROOM });
+        // promise.then(function(imResponse) {
+        //     switch (imResponse.data.status) {
+        //         case TIM.TYPES.JOIN_STATUS_WAIT_APPROVAL: // 等待管理员同意
+        //             break;
+        //         case TIM.TYPES.JOIN_STATUS_SUCCESS: // 加群成功
+        //             console.log(imResponse.data.group); // 加入的群组资料
+        //             break;
+        //         case TIM.TYPES.JOIN_STATUS_ALREADY_IN_GROUP: // 已经在群中
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // }).catch(function(imError) {
+        //     console.warn('joinGroup error:', imError); // 申请加群失败的相关信息
+        // });
     }).catch(function(imError) {
         console.warn('login error:', imError); // 登录失败的相关信息
         console.log('登录失败')
@@ -118,7 +120,7 @@ let onMessageReceived = function(event) {
         let roomId = txt.roomId;
         let userId = txt.userId;
         $('#roomId').val(roomId);
-
+        // $('#userId').val('1234');
         txt.type = ' IM_SEND_CALL_OK'
         let message = tim.createTextMessage({
             to: 'b15ad31ad3e958e297d069c795d4dee7',
