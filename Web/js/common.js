@@ -7,20 +7,21 @@ let share = null;
 let shareUserId = '';
 let cameraId = '';
 let micId = '';
-var URL = 'http://{server}/acd/'
+var URL_ = 'http://202.108.60.54:8001/acd/'
 var agent_Id = null;
 var cusId = null; //客户号
 var room_Id = null; //房间id
 var token_ = null;
 var login_Name = ''
+var login_token;
 
 function login() {
     if ($('#userId').val() == '') {
-        alert('用户名不能为空！');
+        //   alert('用户名不能为空！');
         return;
     }
     if ($('#roomId').val() == '') {
-        alert('房间号不能为空！');
+        //   alert('房间号不能为空！');
         return;
     }
     presetting.login(false, options => {
@@ -34,11 +35,12 @@ function login() {
 }
 
 function join() {
+    //console.log(login_Name)
     rtc.join();
     $('#login-root').hide();
     $('#room-root').show();
     $('#header-roomId').html('房间号: ' + $('#roomId').val());
-    $('#member-me').find('.member-id').html($('#userId').val() + '(我)');
+    $('#member-me').find('.member-id').html(login_Name + '(我)');
 }
 
 function leave() {
@@ -410,7 +412,8 @@ function leaveOut() {
 }
 
 //登入坐席
-function loginAgent() {
+async function loginAgent() {
+    let flag = false;
     let name = $('.nameInp').val();
     let pwd = $('.passInp').val();
     if (name == '') {
@@ -421,58 +424,66 @@ function loginAgent() {
         showTip('房间号不能为空！')
         return;
     }
+    // return true;
     let params = {
         loginName: name,
-        password: pwd,
-        type: 1,
-        deviceId: ''
+        password: md5(pwd).toUpperCase(),
+        type: 2,
+        deviceId: '11'
     }
+
     let url = 'login'
-    fetchPost(url, JSON.stringify(params)).then(res => {
+    console.log(URL_ + url)
+    await fetchLogin(url, JSON.stringify(params)).then(res => {
         console.log(res)
         if (res.code == 0) {
-            login_Name = name
-                // $("#loginContainer").hide()
-                //  $("#freeBox").removeClass("hidden")
+            login_Name = name;
+            token_ = res.data;
+            localStorage.agentName = name;
+            localStorage.agentPass = pwd;
+            showTip('登录成功')
+            $("#loginContainer").hide()
+            $("#freeBox").removeClass("hidden")
+            flag = true;
+            return flag;
         } else {
-            showTip(msg)
+            showTip(res.msg)
         }
     }).catch(err => {
         console.log(err)
     })
+    return flag;
 }
 
 //登出坐席
-function logoutAgent() {
+async function logoutAgent() {
+    let flag = false;
     let url = 'logout'
     let params = {
         loginName: login_Name,
-        type: 1
+        type: 2
     }
-    fetchPost(url, JSON.stringify(params)).then(res => {
+    await fetchPost(url, JSON.stringify(params)).then(res => {
         console.log(res)
         if (res.code == 0) {
             // $("#loginContainer").show()
             //  $("#freeBox").addClass("hidden")
-            let promise = tim.quitGroup({ groupID: 'b15ad31ad3e958e297d069c795d4dee7' });
-            promise.then(function(imResponse) {
-                console.log(imResponse.data.groupID); // 退出成功的群 ID
-            }).catch(function(imError) {
-                console.warn('quitGroup error:', imError); // 退出群组失败的相关信息
-            });
+            flag = true;
+            return flag;
         } else {
             showTip(msg)
         }
     }).catch(err => {
         console.log(err)
     })
+    return flag;
 }
 
 //坐席加入
 function joinAgent() {
     let url = 'agent/join'
     let params = {
-        agentId: agent_Id,
+        agentId: login_Name,
         cusId: cus_Id,
         roomId: room_Id,
         operationTime: getTime()
@@ -493,7 +504,7 @@ function joinAgent() {
 function leaveAgent() {
     let url = 'agent/leave'
     let params = {
-        agentId: agent_Id,
+        agentId: login_Name,
         cusId: cus_Id,
         roomId: room_Id,
         operationTime: getTime()
@@ -516,11 +527,11 @@ function reportData(type) {
     let params = {
         loginName: login_Name,
         roomId: room_Id,
-        userType: 1,
+        userType: 2,
         operationTime: getTime(),
         operationType: type
     }
-    fetchPost(url, params).then(res => {
+    fetchPost(url, JSON.stringify(params)).then(res => {
         console.log(res)
     }).catch(err => {
         console.log(err)
@@ -561,9 +572,29 @@ function getTime() {
 function fetchPost(url, params) {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: URL + url,
+            url: URL_ + url,
             type: 'post',
-            // contentType: 'application/json; charset=utf-8',
+            contentType: 'application/json; charset=utf-8',
+            headers: { "Authorization": login_token },
+            data: params,
+            success: function(res) {
+                resolve(res)
+            },
+            error: function(err) {
+                reject(err)
+            }
+        })
+    })
+}
+
+function fetchLogin(url, params) {
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: URL_ + url,
+            type: 'post',
+            //dataType: 'jsonp',
+            contentType: 'application/json; charset=utf-8',
             data: params,
             success: function(res) {
                 resolve(res)
@@ -578,7 +609,7 @@ function fetchPost(url, params) {
 function fetchGet(url, params) {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: URL + url,
+            url: URL_ + url,
             type: 'get',
             contentType: 'application/json; charset=utf-8',
             data: params,

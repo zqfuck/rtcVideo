@@ -48,9 +48,18 @@ TRTC.getMicrophones().then(devices => {
 });
 
 
-
-$(".interRoom").click(function() {
-    loginAgent()
+if (localStorage.agentName) {
+    $('.nameInp').val(localStorage.agentName)
+}
+if (localStorage.agentPass) {
+    $('.passInp').val(localStorage.agentPass)
+}
+$(".interRoom").click(async function() {
+    let res = await loginAgent()
+    console.log(res)
+    if (!res) {
+        return;
+    }
     $("#loginContainer").hide()
     $("#freeBox").removeClass("hidden")
     let promise = tim.joinGroup({ groupID: 'b15ad31ad3e958e297d069c795d4dee7', type: TIM.TYPES.GRP_CHATROOM });
@@ -72,9 +81,14 @@ $(".interRoom").click(function() {
 })
 $(".newCall").click(function() {
     login()
+
 })
-$('.out').click(function() {
-    // logoutAgent()
+$('.out').click(async function() {
+    let res = await logoutAgent();
+    console.log(res)
+    if (!res) {
+        return;
+    }
     let promise = tim.quitGroup('b15ad31ad3e958e297d069c795d4dee7');
     promise.then(function(imResponse) {
         console.log(imResponse.data.groupID); // 退出成功的群 ID

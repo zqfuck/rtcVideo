@@ -131,6 +131,10 @@ div {
     justify-content: center;
 }
 
+.inpBox .bmd-form-group {
+    padding: 0!important;
+}
+
 .inpBox input {
     width: 227px;
     height: 36px;
@@ -140,6 +144,7 @@ div {
     padding-left: 20px;
     font-size: 14px;
     outline: none;
+    margin-top: 20px;
 }
 
 .inpBox button {

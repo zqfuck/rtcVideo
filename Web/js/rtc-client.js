@@ -63,6 +63,8 @@ class RtcClient {
                 this.localStream_.play('main-video');
                 $('#main-video-btns').show();
                 $('#mask_main').appendTo($('#player_' + this.localStream_.getId()));
+                joinAgent()
+                reportData('21')
             } catch (e) {
                 console.error('failed to initialize local stream - ' + e);
             }
@@ -98,12 +100,15 @@ class RtcClient {
         // leave the room
         await this.client_.leave();
         console.log('leave room success');
+
         this.localStream_.stop();
         this.localStream_.close();
 
         this.localStream_ = null;
         this.isJoined_ = false;
         resetView();
+        leaveAgent()
+        reportData('22')
     }
 
     async publish() {
