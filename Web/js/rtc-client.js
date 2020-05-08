@@ -48,6 +48,7 @@ class RtcClient {
                 microphoneId: getMicrophoneId(),
                 mirror: true
             });
+            sendJoinMsg();
             try {
                 // initialize the local stream and the stream will be populated with audio/video
                 await this.localStream_.initialize();
@@ -63,6 +64,7 @@ class RtcClient {
                 this.localStream_.play('main-video');
                 $('#main-video-btns').show();
                 $('#mask_main').appendTo($('#player_' + this.localStream_.getId()));
+
                 joinAgent()
                 reportData('21')
             } catch (e) {
@@ -70,6 +72,10 @@ class RtcClient {
             }
         } catch (e) {
             console.error('join room failed! ' + e);
+            showTip('接听失败,请重新登录')
+            setTimeout(() => {
+                location.reload()
+            }, 2200)
         }
         //更新成员状态
         let states = this.client_.getRemoteMutedState();
@@ -198,6 +204,7 @@ class RtcClient {
             if (userId !== shareUserId) {
                 addMemberView(userId);
             }
+
         });
         // fired when a remote peer is leaving the room
         this.client_.on('peer-leave', evt => {

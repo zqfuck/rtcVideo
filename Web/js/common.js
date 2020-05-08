@@ -13,7 +13,7 @@ var cusId = null; //客户号
 var room_Id = null; //房间id
 var token_ = null;
 var login_Name = ''
-var login_token;
+var callInMsg; //收到呼叫信息
 
 function login() {
     if ($('#userId').val() == '') {
@@ -161,6 +161,7 @@ function setBtnClickFuc() {
     });
     //switch main video
     $('#main-video').on('click', () => {
+        //  changeMainVideo();
         let mainVideo = $('.video-box').first();
         if ($('#main-video').is(mainVideo)) {
             return;
@@ -175,6 +176,8 @@ function setBtnClickFuc() {
             rtc.resumeStreams();
         }
     });
+    //切换main video
+
 
     //chrome60以下不支持popover，防止error
     if (getBroswer().broswer == 'Chrome' && getBroswer().version < '60')
@@ -227,6 +230,22 @@ function setBtnClickFuc() {
         $('#microphone').attr('src', './img/mic.png');
     });
 }
+//切换主位置
+function changeMainVideo() {
+    let mainVideo = $('.video-box').first();
+    if ($('#main-video').is(mainVideo)) {
+        return;
+    }
+    //释放main-video grid-area
+    mainVideo.css('grid-area', 'auto/auto/auto/auto');
+    exchangeView($('#main-video'), mainVideo);
+    //将video-grid中第一个div设为main-video
+    $('.video-box').first().css('grid-area', '1/1/3/4');
+    //chromeM71以下会自动暂停，手动唤醒
+    if (getBroswer().broswer == 'Chrome' && getBroswer().version < '72') {
+        rtc.resumeStreams();
+    }
+}
 
 function setCameraId(thisDiv) {
     cameraId = $(thisDiv).attr('id');
@@ -244,7 +263,7 @@ function addVideoView(id, isLocal = false) {
         class: 'video-box',
         style: 'justify-content: center'
     });
-    div.appendTo('#video-grid');
+    div.prependTo('#video-grid'); //位置
     //设置监听
     div.click(() => {
         let mainVideo = $('.video-box').first();
@@ -435,7 +454,7 @@ async function loginAgent() {
     let url = 'login'
     console.log(URL_ + url)
     await fetchLogin(url, JSON.stringify(params)).then(res => {
-        console.log(res)
+        // console.log(res)
         if (res.code == 0) {
             login_Name = name;
             token_ = res.data;
@@ -464,7 +483,7 @@ async function logoutAgent() {
         type: 2
     }
     await fetchPost(url, JSON.stringify(params)).then(res => {
-        console.log(res)
+        //     console.log(res)
         if (res.code == 0) {
             // $("#loginContainer").show()
             //  $("#freeBox").addClass("hidden")
@@ -489,7 +508,7 @@ function joinAgent() {
         operationTime: getTime()
     };
     fetchPost(url, JSON.stringify(params)).then(res => {
-        console.log(res)
+        //  console.log(res)
         if (res.code == 0) {
 
         } else {
@@ -499,7 +518,31 @@ function joinAgent() {
         console.log(err)
     })
 }
+//坐席加入发消息通知
+function sendJoinMsg() {
+    let message = tim.createTextMessage({
+        to: 'b15ad31ad3e958e297d069c795d4dee7',
+        conversationType: TIM.TYPES.CONV_GROUP,
+        payload: {
+            text: JSON.stringify(callInMsg)
+        }
+    });
+    // console.log(callInMsg)
+    let res = tim.sendMessage(message);
 
+    res.then(function(imResponse) {
+        // 发送成功
+        //  console.log(JSON.parse(imResponse))
+        // console.log(imResponse + '发送成功');
+        // $(".freeBottom").addClass("hidden")
+        // $(".answwerBox").removeClass("hidden")
+        // login()
+    }).catch(function(imError) {
+        // 发送失败
+        console.log('发送失败')
+        console.warn('sendMessage error:', imError);
+    });
+}
 //坐席离开
 function leaveAgent() {
     let url = 'agent/leave'
@@ -510,7 +553,7 @@ function leaveAgent() {
         operationTime: getTime()
     };
     fetchPost(url, JSON.stringify(params)).then(res => {
-        console.log(res)
+        //   console.log(res)
         if (res.code == 0) {
 
         } else {
@@ -532,11 +575,19 @@ function reportData(type) {
         operationType: type
     }
     fetchPost(url, JSON.stringify(params)).then(res => {
-        console.log(res)
+        //    console.log(res)
     }).catch(err => {
         console.log(err)
     })
 }
+//页面刷新时
+/*window.addEventListener("beforeunload", () => {
+if (cus_Id) {
+    // leaveAgent();
+    //  reportData('22');
+}
+
+});*/
 
 function getTime() {
     let day = new Date(); //将毫秒转化为当前日期
@@ -575,7 +626,7 @@ function fetchPost(url, params) {
             url: URL_ + url,
             type: 'post',
             contentType: 'application/json; charset=utf-8',
-            headers: { "Authorization": login_token },
+            headers: { "Authorization": token_ },
             data: params,
             success: function(res) {
                 resolve(res)
@@ -593,6 +644,7 @@ function fetchLogin(url, params) {
         $.ajax({
             url: URL_ + url,
             type: 'post',
+            // headers: { "Authorization": token_ },
             //dataType: 'jsonp',
             contentType: 'application/json; charset=utf-8',
             data: params,
