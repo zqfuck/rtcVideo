@@ -1,6 +1,5 @@
 const presetting = new Presetting();
 presetting.init();
-
 // check if browser is compatible with TRTC
 TRTC.checkSystemRequirements().then(result => {
     if (!result) {
@@ -64,7 +63,7 @@ $(".interRoom").click(async function() {
     }
     $("#loginContainer").hide()
     $("#freeBox").removeClass("hidden")
-
+    $(".agentName").html(login_Name)
 })
 $(".newCall").click(function() {
     login()

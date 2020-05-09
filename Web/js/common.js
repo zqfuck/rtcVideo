@@ -7,7 +7,8 @@ let share = null;
 let shareUserId = '';
 let cameraId = '';
 let micId = '';
-var URL_ = 'http://202.108.60.54:8001/acd/'
+var URL_ = 'https://livet.v114.com/acd/' //http://202.108.60.54:8001/acd/
+    //var URL_ = 'http://202.108.60.54:8001/acd/'
 var agent_Id = null;
 var cusId = null; //客户号
 var room_Id = null; //房间id
@@ -25,10 +26,14 @@ function login() {
         return;
     }
     presetting.login(false, options => {
+
+        //  console.log(options)
         rtc = new RtcClient(options);
         join();
     });
     presetting.login(true, options => {
+
+        // console.log(options)
         shareUserId = options.userId;
         share = new ShareClient(options);
     });
@@ -448,7 +453,7 @@ async function loginAgent() {
         loginName: name,
         password: md5(pwd).toUpperCase(),
         type: 2,
-        deviceId: '11'
+        deviceId: ''
     }
 
     let url = 'login'
@@ -505,6 +510,7 @@ function joinAgent() {
         agentId: login_Name,
         cusId: cus_Id,
         roomId: room_Id,
+        type: 2,
         operationTime: getTime()
     };
     fetchPost(url, JSON.stringify(params)).then(res => {
@@ -550,6 +556,7 @@ function leaveAgent() {
         agentId: login_Name,
         cusId: cus_Id,
         roomId: room_Id,
+        type: 2,
         operationTime: getTime()
     };
     fetchPost(url, JSON.stringify(params)).then(res => {
