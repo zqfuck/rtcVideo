@@ -64,6 +64,7 @@ $(".interRoom").click(async function() {
     $("#loginContainer").hide()
     $("#freeBox").removeClass("hidden")
     $(".agentName").html(login_Name)
+    reportLog('28', 'agentLogin')
 })
 $(".newCall").click(function() {
     login()
@@ -84,4 +85,5 @@ $('.out').click(async function() {
     });
     $("#loginContainer").show()
     $("#freeBox").addClass("hidden")
+    reportLog('29', 'agentLogout')
 })

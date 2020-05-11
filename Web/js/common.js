@@ -543,6 +543,7 @@ function sendJoinMsg() {
         // $(".freeBottom").addClass("hidden")
         // $(".answwerBox").removeClass("hidden")
         // login()
+        reportLog('26', 'agentJoinRoomOk')
     }).catch(function(imError) {
         // 发送失败
         console.log('发送失败')
@@ -572,6 +573,8 @@ function leaveAgent() {
 }
 
 //汇报数据
+//AGENT_LEAVE_ROOM(22, "坐席离开房间"),
+//,AGENT_JOIN_ROOM(21, "坐席进入房间")
 function reportData(type) {
     let url = 'report/send'
     let params = {
@@ -587,14 +590,78 @@ function reportData(type) {
         console.log(err)
     })
 }
-//页面刷新时
-/*window.addEventListener("beforeunload", () => {
-if (cus_Id) {
-    // leaveAgent();
-    //  reportData('22');
+//汇报 坐席的日志  不需要roomid 
+/* AGENT_IM_LOGIN(25, "坐席登录IM")
+AGENT_IM_SEND(26, "坐席发送消息"),
+    AGENT_IM_ACCEPT(27, "坐席接收消息"),
+    AGENT_LOGIN(28, "坐席登录"),
+    AGENT_LOGOUT(29, "坐席登出"),*/
+function reportLog(type, remarkLog) {
+    let url = 'report/send'
+    let params = {
+        loginName: login_Name,
+        userType: 2,
+        operationTime: getTime(),
+        operationType: type,
+        remark: remarkLog
+    }
+    fetchPost(url, JSON.stringify(params)).then(res => {
+        //    console.log(res)
+    }).catch(err => {
+        console.log(err)
+    })
 }
+//通知坐席置闲
+function setFree() {
+    let url = 'agent/free'
+    let params = {
+        agentId: login_Name
+    }
+    fetchPost(url, JSON.stringify(params)).then(res => {
+        //    console.log(res)
+    }).catch(err => {
+        console.log(err)
+        showTip('坐席置闲失败，请重新登录')
+        setTimeout(() => {
+            location.reload()
+        }, 2500)
+    })
+}
+//页面刷新时
+window.addEventListener("beforeunload", () => {
+    if (cus_Id) {
+        leaveAgent();
+        reportData('22');
+    }
+    logoutAgent()
+});
 
-});*/
+
+//心跳im
+function heartIm() {
+    setTimeout(() => {
+        let heartMsg = { "agentId": login_Name, "type": "IM_SEND_HEART_OK" };
+        let message = tim.createTextMessage({
+            to: 'b15ad31ad3e958e297d069c795d4dee7',
+            conversationType: TIM.TYPES.CONV_GROUP,
+            payload: {
+                text: heartMsg
+            }
+        });
+        // console.log(callInMsg)
+        let res = tim.sendMessage(message);
+
+        res.then(function(imResponse) {
+
+        }).catch(function(imError) {
+            // 发送失败
+            reportLog('26', 'agentImHeartFail')
+            location.reload()
+            console.log('发送失败')
+            console.warn('sendMessage error:', imError);
+        });
+    }, 60000)
+}
 
 function getTime() {
     let day = new Date(); //将毫秒转化为当前日期
