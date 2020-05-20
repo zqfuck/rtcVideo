@@ -66,9 +66,9 @@ function loginIm(userName, sig_) {
                     break;
                 case TIM.TYPES.JOIN_STATUS_SUCCESS: // 加群成功
                     console.log(imResponse.data.group); // 加入的群组资料
-                    setFree();
-                    heartIm();
-                    reportLog('25', 'imSuccess')
+                    //    setFree();
+                    //     heartIm();
+                    //   reportLog('25', 'imSuccess')
                     break;
                 case TIM.TYPES.JOIN_STATUS_ALREADY_IN_GROUP: // 已经在群中
                     break;
@@ -119,7 +119,7 @@ let onMessageReceived = function(event) {
     //  console.log(event)
     let txt = event.data[0].payload.text
     console.log(txt)
-    reportLog('27', txt)
+
 
     if (txt && txt.indexOf('IM_REQ_CALL') > -1) {
         txt = JSON.parse(txt)
@@ -139,7 +139,7 @@ let onMessageReceived = function(event) {
         callInMsg = txt;
         $(".freeBottom").addClass("hidden")
         $(".answwerBox").removeClass("hidden")
-
+        reportLog('27', JSON.stringify(txt))
 
         /* let message = tim.createTextMessage({
             to: 'b15ad31ad3e958e297d069c795d4dee7',
@@ -167,7 +167,9 @@ let onMessageReceived = function(event) {
     } else if (txt && txt.indexOf('IM_SEND_CALL_FAIL') > -1) {
         $(".freeBottom").removeClass("hidden")
         $(".answwerBox").addClass("hidden")
-        leaveAgent()
+        if (cus_Id) {
+            leaveAgent();
+        }
     }
 };
 tim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);

@@ -56,6 +56,7 @@ if (localStorage.agentPass) {
 }
 $(".interRoom").click(async function() {
     let res = await loginAgent()
+    console.log(login_Name)
     getUserSig(login_Name)
     console.log(res)
     if (!res) {

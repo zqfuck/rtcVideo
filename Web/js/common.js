@@ -10,7 +10,7 @@ let micId = '';
 var URL_ = 'https://livet.v114.com/acd/' //http://202.108.60.54:8001/acd/
     //var URL_ = 'http://202.108.60.54:8001/acd/'
 var agent_Id = null;
-var cusId = null; //客户号
+var cus_Id = null; //客户号
 var room_Id = null; //房间id
 var token_ = null;
 var login_Name = ''
@@ -639,13 +639,13 @@ window.addEventListener("beforeunload", () => {
 
 //心跳im
 function heartIm() {
-    setTimeout(() => {
+    setInterval(() => {
         let heartMsg = { "agentId": login_Name, "type": "IM_SEND_HEART_OK" };
         let message = tim.createTextMessage({
             to: 'b15ad31ad3e958e297d069c795d4dee7',
             conversationType: TIM.TYPES.CONV_GROUP,
             payload: {
-                text: heartMsg
+                text: JSON.stringify(heartMsg)
             }
         });
         // console.log(callInMsg)
